@@ -12,3 +12,9 @@ hs_err_pid*
 # Ignore Gradle build output directory
 build
 /gradle/
+/.bsp/
+*/project/
+*/.bsp/
+*/target/
+/project/
+/target/
