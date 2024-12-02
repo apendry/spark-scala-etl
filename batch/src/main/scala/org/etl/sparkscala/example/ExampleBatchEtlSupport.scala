@@ -1,13 +1,12 @@
 package org.etl.sparkscala.example
 
-import org.apache.spark.sql.connector.catalog.TableChange.ColumnPosition.first
-import org.apache.spark.sql.functions.{array, explode, size, sum}
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.etl.sparkscala.schemas.example.{ExampleData, ExampleHobby, ExampleMeta}
 
 object ExampleBatchEtlSupport {
 
-  case class PreparedInput(id: Int, hobbies: Array[ExampleHobby], totalCost: BigDecimal)
+  case class PreparedInput(id: Long, hobbies: Array[ExampleHobby], totalCost: BigDecimal)
   case class ExampleOutput(firstName: String, lastName: String, hobbyName: String, percentCost: BigDecimal)
 
 
@@ -18,15 +17,13 @@ object ExampleBatchEtlSupport {
 
     inputData
       .filter($"active" && size($"hobbies") > 0)
-      .agg(explode($"hobbies").as("hobby"))
       .select(
         $"id",
-        $"hobby.name".as("name"),
-        $"hobby.cost".as("cost")
+        explode($"hobbies").as("hobby")
       ).groupBy($"id")
       .agg(
-        array($"name", $"cost").as("hobbies"),
-        sum($"cost").as("totalCost")
+        collect_set(struct($"hobby.name", $"hobby.cost")).as("hobbies"),
+        sum($"hobby.cost").as("totalCost")
       ).as[PreparedInput]
 
   }
@@ -40,15 +37,14 @@ object ExampleBatchEtlSupport {
     preparedInput
       .join(
         inputMeta,
-        $"id",
+        Seq("id"),
         "inner"
-      )
-      .agg(explode($"hobbies").as("hobby"))
+      ).withColumn("hobby", explode($"hobbies"))
       .select(
         $"firstName",
         $"lastName",
         $"hobby.name".as("hobbyName"),
-        ($"hobby.cost" / $"cost").as("percentCost")
+        round($"hobby.cost" / $"totalCost", 2).as("percentCost")
       ).as[ExampleOutput]
   }
 

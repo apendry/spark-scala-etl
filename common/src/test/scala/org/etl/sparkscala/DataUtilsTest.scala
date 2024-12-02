@@ -36,7 +36,7 @@ class DataUtilsTest extends AnyFlatSpec with Matchers {
 
   it should "parse epoch with user zone and default format" in {
     val edtZoneId = ZoneId.of("America/Toronto")
-    longToZonedFormattedDateString(zone = edtZoneId)(defaultEpochTimestamp) shouldBe "2024-12-23T19:00:00-05:00"
+    longToZonedFormattedDateString(zone = edtZoneId)(defaultEpochTimestamp) shouldBe "2023-12-31T19:00:00-05:00"
   }
 
   it should "parse epoch with user zone and format" in {
