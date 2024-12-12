@@ -1,12 +1,17 @@
 ThisBuild / organization := "org.etl.sparkscala"
 ThisBuild / scalaVersion := "2.12.18"
 ThisBuild / version      := "0.1.0-SNAPSHOT"
+ThisBuild / assembly / assemblyJarName := s"spark-scala-etl-uber-${(ThisBuild / version).value}.jar"
+ThisBuild / assembly / assemblyMergeStrategy := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
 
 lazy val sparkVersion = "3.2.0"
 lazy val sparkTestVersion = "3.2.19"
 
 lazy val commonDependencies = Seq(
-  "org.apache.spark" %% "spark-core" % sparkVersion,
+  "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
   "org.rogach" %% "scallop" % "5.1.0",
   "org.scalactic" %% "scalactic" % sparkTestVersion,
 
