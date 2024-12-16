@@ -3,14 +3,15 @@ package org.etl.sparkscala.example
 import org.etl.sparkscala.DataUtils.{readCsv, readParquet}
 import org.etl.sparkscala.entrypoint.SparkSupport
 import org.etl.sparkscala.example.ExampleBatchEtlSupport.{generateOutput, prepareInputData}
-import org.etl.sparkscala.schemas.example.{ExampleData, ExampleMeta}
+import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleData, ExamplePersonMeta}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
 object ExampleBatchEtl extends SparkSupport {
 
   private class ArgParse(arguments: Seq[String]) extends ScallopConf(arguments) {
     val inputData: ScallopOption[String] = opt[String](required = true)
-    val inputMeta: ScallopOption[String] = opt[String](required = true)
+    val inputPersonMeta: ScallopOption[String] = opt[String](required = true)
+    val inputActivityMeta: ScallopOption[String] = opt[String](required = true)
     val output: ScallopOption[String] = opt[String](required = true)
     verify()
   }
@@ -21,12 +22,13 @@ object ExampleBatchEtl extends SparkSupport {
     val argParse = new ArgParse(args)
 
     //Extract
-    val exampleData = readCsv[ExampleData](argParse.inputData())
-    val exampleMeta = readParquet[ExampleMeta](argParse.inputMeta())
+    val exampleData = readParquet[ExampleData](argParse.inputData())
+    val examplePersonMeta = readParquet[ExamplePersonMeta](argParse.inputPersonMeta())
+    val exampleActivityMeta = readParquet[ExampleActivityMeta](argParse.inputActivityMeta())
 
     //Transform
     val preparedInput = prepareInputData(exampleData)
-    val output = generateOutput(preparedInput, exampleMeta)
+    val output = generateOutput(preparedInput, examplePersonMeta, exampleActivityMeta)
 
     //Load
     output.write.parquet(argParse.output())

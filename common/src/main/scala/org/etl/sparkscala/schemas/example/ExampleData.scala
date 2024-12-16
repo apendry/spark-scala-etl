@@ -1,3 +1,3 @@
 package org.etl.sparkscala.schemas.example
 
-case class ExampleData(id: Long, active: Boolean, hobbies: Array[ExampleHobby])
+case class ExampleData(dateHour: Long, id: Int, caloriesConsumed: Long, caloriesExpended: Long, activity: ExampleActivity)

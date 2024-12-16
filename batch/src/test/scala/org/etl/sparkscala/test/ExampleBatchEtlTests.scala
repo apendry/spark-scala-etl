@@ -3,20 +3,20 @@ package org.etl.sparkscala.test
 import org.etl.sparkscala.entrypoint.SparkSupportTest
 import org.etl.sparkscala.example.ExampleBatchEtlSupport.{ExampleOutput, PreparedInput, generateOutput, prepareInputData}
 import org.etl.sparkscala.schemas.example
-import org.etl.sparkscala.schemas.example.{ExampleData, ExampleHobby, ExampleMeta}
+import org.etl.sparkscala.schemas.example.{ExampleData, ExampleActivity, ExamplePersonMeta}
 import org.scalatest.Inside
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class ExampleBatchEtlTests extends AnyFlatSpec with Matchers with Inside with SparkSupportTest {
 
-  private val validHobbiesOne = Array(ExampleHobby("hobby1", 100), ExampleHobby("hobby2", 200))
-  private val validHobbiesTwo = Array(ExampleHobby("hobby3", 300), ExampleHobby("hobby4", 400))
+  private val validHobbiesOne = Array(ExampleActivity("hobby1", 100), ExampleActivity("hobby2", 200))
+  private val validHobbiesTwo = Array(ExampleActivity("hobby3", 300), ExampleActivity("hobby4", 400))
 
   "prepareInputData" should "filter inactive and empty hobbies" in {
     import spark.implicits._
 
-    val validHobby = ExampleHobby("validHobby", 0)
+    val validHobby = ExampleActivity("validHobby", 0)
 
     val testInput = spark.createDataset(Seq(
       ExampleData(1, true, Array(validHobby)),
@@ -29,7 +29,7 @@ class ExampleBatchEtlTests extends AnyFlatSpec with Matchers with Inside with Sp
     inside(result) { case PreparedInput(id, hobbies, totalCost) =>
       id shouldBe 1
       totalCost shouldBe 0
-      inside(hobbies.head) { case ExampleHobby(name, cost) =>
+      inside(hobbies.head) { case ExampleActivity(name, cost) =>
         name shouldBe "validHobby"
         cost shouldBe 0
       }
@@ -66,9 +66,9 @@ class ExampleBatchEtlTests extends AnyFlatSpec with Matchers with Inside with Sp
     import spark.implicits._
 
     val inputMeta = spark.createDataset(Seq(
-      ExampleMeta(1, "Kathryn", "Janeway", 41),
-      ExampleMeta(2, "Tom", "Paris", 32)
-    )).as[ExampleMeta]
+      ExamplePersonMeta(1, "Kathryn", "Janeway", 41),
+      ExamplePersonMeta(2, "Tom", "Paris", 32)
+    )).as[ExamplePersonMeta]
 
     val preparedInput = spark.createDataset(Seq(
       PreparedInput(1, validHobbiesOne, 300),
