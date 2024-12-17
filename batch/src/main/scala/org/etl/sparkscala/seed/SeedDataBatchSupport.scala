@@ -1,9 +1,14 @@
 package org.etl.sparkscala.seed
 
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.{Dataset, Encoder, Row, SparkSession}
-import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleData, ExamplePersonMeta}
+import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
 
-object SeedBatchEtlSupport {
+import java.time.Instant
+import scala.annotation.tailrec
+import scala.util.Random
+
+object SeedDataBatchSupport {
 
   /**
    * Convenience method to call the correct generation
@@ -13,22 +18,40 @@ object SeedBatchEtlSupport {
    * @tparam T Data schema
    * @return Dataset of type T
    */
-  def generateData[T](rows: Long = 1000L)
-                     (implicit spark: SparkSession,
-                      encoder: Encoder[T]):
+  def generateData[T](rows: Option[Long],
+                      targetEpoch: Option[Long])
+                     (implicit spark: SparkSession):
   Dataset[T] = {
+    implicit val encoder: ExpressionEncoder[T] = ExpressionEncoder[T]
+    implicit val rowEncoder: ExpressionEncoder[Row] = ExpressionEncoder[Row]
+
+    val rowCount = rows.getOrElse(1000L)
+    val epoch = targetEpoch.getOrElse(Instant.now().toEpochMilli)
+
     classOf[T] match {
-      case ExampleData => generateExampleData(rows)
-      case ExamplePersonMeta => generateExamplePersonMeta()
+      case ExampleCaloriesData => generateCaloriesData(rowCount, epoch)
+      case ExamplePersonMeta => generateExamplePersonMeta
+      case ExampleActivityMeta => generateExampleActivityMeta
       case _ => throw new RuntimeException(s"Unknown schema ${_}")
     }
   }
 
-  private def generateExampleData[T](rows: Long)
-                                    (implicit spark: SparkSession):
+  private def generateCaloriesData[T](rows: Long,
+                                     targetEpoch: Long)
+                                    (implicit spark: SparkSession,
+                                     encoder: Encoder[T],
+                                     rowEncoder: Encoder[Row]):
   Dataset[T] = {
-
+    spark.createDataset(
+      (0 to rows).map(_ => {
+        val examplePerson = Random.shuffle(examplePeopleSeq).head
+        val exampleActivity = Random.shuffle(exampleActivitySeq).head
+        Row(targetEpoch, examplePerson.id, generateRandomCalories, generateRandomCalories, exampleActivity)
+      })
+    ).as[T]
   }
+
+  private val generateRandomCalories = () => { Math.max(200, Random.nextGaussian() + 750) }
 
   /**
    * Since we're doing joins on IDs we need to pull from a pool
@@ -37,12 +60,22 @@ object SeedBatchEtlSupport {
    *
    * This meta is going to be a static dataset.
   */
-  private def generateExamplePersonMeta[T](implicit spark: SparkSession,
-                                     encoder: Encoder[T]):
+  private def generateExamplePersonMeta[T](implicit spark: SparkSession, encoder: Encoder[T]):
   Dataset[T] = {
     import spark.implicits._
 
     spark.createDataset(examplePeopleSeq).as[T]
+
+  }
+
+  /**
+   * Generating
+   */
+  private def generateExampleActivityMeta[T](implicit spark: SparkSession, encoder: Encoder[T]):
+  Dataset[T] = {
+    import spark.implicits._
+
+    spark.createDataset(exampleActivitySeq).as[T]
 
   }
 

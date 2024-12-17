@@ -3,7 +3,7 @@ package org.etl.sparkscala.test
 import org.etl.sparkscala.entrypoint.SparkSupportTest
 import org.etl.sparkscala.example.ExampleBatchEtlSupport.{ExampleOutput, PreparedInput, generateOutput, prepareInputData}
 import org.etl.sparkscala.schemas.example
-import org.etl.sparkscala.schemas.example.{ExampleData, ExampleActivity, ExamplePersonMeta}
+import org.etl.sparkscala.schemas.example.{ExampleCaloriesData, ExampleActivity, ExamplePersonMeta}
 import org.scalatest.Inside
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -19,10 +19,10 @@ class ExampleBatchEtlTests extends AnyFlatSpec with Matchers with Inside with Sp
     val validHobby = ExampleActivity("validHobby", 0)
 
     val testInput = spark.createDataset(Seq(
-      ExampleData(1, true, Array(validHobby)),
-      ExampleData(2, false, Array(validHobby)),
-      ExampleData(3, true, Array()),
-    )).as[ExampleData]
+      ExampleCaloriesData(1, true, Array(validHobby)),
+      ExampleCaloriesData(2, false, Array(validHobby)),
+      ExampleCaloriesData(3, true, Array()),
+    )).as[ExampleCaloriesData]
 
     val result = prepareInputData(testInput).collect().head
 
@@ -41,9 +41,9 @@ class ExampleBatchEtlTests extends AnyFlatSpec with Matchers with Inside with Sp
     import spark.implicits._
 
     val testInput = spark.createDataset(Seq(
-      ExampleData(1, true, validHobbiesOne),
-      ExampleData(2, true, validHobbiesTwo),
-    )).as[ExampleData]
+      ExampleCaloriesData(1, true, validHobbiesOne),
+      ExampleCaloriesData(2, true, validHobbiesTwo),
+    )).as[ExampleCaloriesData]
 
     val result = prepareInputData(testInput)
       .orderBy($"id".asc)

@@ -2,7 +2,7 @@ package org.etl.sparkscala.example
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.etl.sparkscala.schemas.example.{ExampleActivity, ExampleActivityMeta, ExampleData, ExamplePersonMeta}
+import org.etl.sparkscala.schemas.example.{ExampleActivity, ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
 
 object ExampleBatchEtlSupport {
 
@@ -10,7 +10,7 @@ object ExampleBatchEtlSupport {
   case class ExampleOutput(firstName: String, lastName: String, hobbyName: String, percentCost: BigDecimal)
 
 
-  def prepareInputData(inputData: Dataset[ExampleData])
+  def prepareInputData(inputData: Dataset[ExampleCaloriesData])
                       (implicit spark: SparkSession):
   Dataset[PreparedInput] = ???
 

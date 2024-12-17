@@ -3,7 +3,7 @@ package org.etl.sparkscala.example
 import org.etl.sparkscala.DataUtils.{readCsv, readParquet}
 import org.etl.sparkscala.entrypoint.SparkSupport
 import org.etl.sparkscala.example.ExampleBatchEtlSupport.{generateOutput, prepareInputData}
-import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleData, ExamplePersonMeta}
+import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
 object ExampleBatchEtl extends SparkSupport {
@@ -22,7 +22,7 @@ object ExampleBatchEtl extends SparkSupport {
     val argParse = new ArgParse(args)
 
     //Extract
-    val exampleData = readParquet[ExampleData](argParse.inputData())
+    val exampleData = readParquet[ExampleCaloriesData](argParse.inputData())
     val examplePersonMeta = readParquet[ExamplePersonMeta](argParse.inputPersonMeta())
     val exampleActivityMeta = readParquet[ExampleActivityMeta](argParse.inputActivityMeta())
 
