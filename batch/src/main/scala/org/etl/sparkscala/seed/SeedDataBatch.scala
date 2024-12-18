@@ -7,6 +7,10 @@ import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleCaloriesD
 import org.etl.sparkscala.seed.SeedDataBatchSupport._
 import org.rogach.scallop.{ScallopConf, ScallopOption, Subcommand}
 
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.{ChronoUnit, TemporalUnit}
+
 /**
  * The following process is simply used to populate the test data that
  * downstream tasks require. It could mimic a log dump, application
@@ -20,10 +24,11 @@ object SeedDataBatch extends SparkSupport {
   private val log: Logger = Logger.getLogger(SeedDataBatch.getClass)
 
   private class ArgParse(arguments: Seq[String]) extends ScallopConf(arguments) {
+
     val calories = new Subcommand("calories") {
       val output: ScallopOption[String] = opt[String](required = true)
-      val rows: ScallopOption[Long] = opt[Long](required = false)
-      val targetDate: ScallopOption[Long] = opt[Long](required = false)
+      val rows: ScallopOption[Long] = opt[Long](required = false, default = Some(1000L))
+      val targetDate: ScallopOption[String] = opt[String](required = true)
     }
 
     val peopleMetaOutput: ScallopOption[String] = opt[String](required = false)
@@ -35,21 +40,26 @@ object SeedDataBatch extends SparkSupport {
   def main(args: Array[String]): Unit = {
     val argParse = new ArgParse(args)
 
+    val zonedTargetDateTime = ZonedDateTime.parse(argParse.calories.targetDate())
+
     //Generating Calories Seed Data
     if(argParse.calories.output.isDefined){
+      val targetDateTime = zonedTargetDateTime.truncatedTo(ChronoUnit.HOURS)
       log.info(s"Running Calories Output, destination: ${argParse.calories.output()}")
-      val exampleCaloriesOutput = generateData(argParse.calories.rows.toOption, argParse.calories.targetDate.toOption)[ExampleCaloriesData]
+      val exampleCaloriesOutput: Dataset[ExampleCaloriesData] = generateCaloriesData(argParse.calories.rows(), targetDateTime.toInstant.toEpochMilli)
       exampleCaloriesOutput.write.parquet(argParse.calories.output())
     }
 
     //Generating Person Seed Meta
     if(argParse.peopleMetaOutput.isDefined){
-      generateData[ExamplePersonMeta]
+      val personMeta: Dataset[ExamplePersonMeta] = generatePersonMeta()
+      personMeta.write.parquet(argParse.peopleMetaOutput())
     }
 
     //Generating Activity Seed Meta
     if(argParse.activityMetaOutput.isDefined){
-      generateData[ExampleActivityMeta]
+      val activityMeta: Dataset[ExampleActivityMeta] = generateActivityMeta()
+      activityMeta.write.parquet(argParse.activityMetaOutput())
     }
 
   }
