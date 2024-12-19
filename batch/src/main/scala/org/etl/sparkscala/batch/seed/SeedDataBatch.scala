@@ -1,10 +1,10 @@
-package org.etl.sparkscala.seed
+package org.etl.sparkscala.batch.seed
 
 import org.apache.log4j.Logger
 import org.apache.spark.sql.Dataset
-import org.etl.sparkscala.entrypoint.SparkSupport
-import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
-import org.etl.sparkscala.seed.SeedDataBatchSupport._
+import SeedDataBatchSupport._
+import org.etl.sparkscala.common.entrypoint.SparkSupport
+import org.etl.sparkscala.common.example.{ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
 import org.rogach.scallop.{ScallopConf, ScallopOption, Subcommand}
 
 import java.time.ZonedDateTime
@@ -19,9 +19,9 @@ import java.time.temporal.{ChronoUnit, TemporalUnit}
  * The data being output will be randomly generated using scala gen
  * but will still adhere to the required downstream schemas expected.
  */
-object SeedDataBatch extends SparkSupport {
+class SeedDataBatch extends SparkSupport {
 
-  private val log: Logger = Logger.getLogger(SeedDataBatch.getClass)
+  private val log: Logger = Logger.getLogger(this.getClass)
 
   private class ArgParse(arguments: Seq[String]) extends ScallopConf(arguments) {
 

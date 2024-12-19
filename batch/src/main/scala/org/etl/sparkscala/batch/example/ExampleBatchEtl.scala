@@ -1,9 +1,9 @@
-package org.etl.sparkscala.example
+package org.etl.sparkscala.batch.example
 
-import org.etl.sparkscala.DataUtils.{readCsv, readParquet}
-import org.etl.sparkscala.entrypoint.SparkSupport
-import org.etl.sparkscala.example.ExampleBatchEtlSupport.{generateOutput, prepareInputData}
-import org.etl.sparkscala.schemas.example.{ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
+import org.etl.sparkscala.common.DataUtils.{readCsv, readParquet}
+import ExampleBatchEtlSupport.{generateOutput, prepareInputData}
+import org.etl.sparkscala.common.entrypoint.SparkSupport
+import org.etl.sparkscala.common.example.{ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
 object ExampleBatchEtl extends SparkSupport {

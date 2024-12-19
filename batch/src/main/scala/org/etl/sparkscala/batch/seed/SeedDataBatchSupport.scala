@@ -1,12 +1,9 @@
-package org.etl.sparkscala.seed
+package org.etl.sparkscala.batch.seed
 
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
-import org.apache.spark.sql.{Dataset, Encoder, Row, SparkSession}
-import org.etl.sparkscala.schemas.example.{ExampleActivity, ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
+import org.apache.spark.sql.{Dataset, SparkSession}
+import org.etl.sparkscala.common.example.{ExampleActivity, ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
 
-import java.time.Instant
 import scala.util.Random
-import scala.reflect.runtime.{universe => ru}
 
 object SeedDataBatchSupport {
 

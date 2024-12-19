@@ -1,6 +1,6 @@
 package org.etl.sparkscala
 
-import org.etl.sparkscala.DateTimeUdfs.{longToZonedDateTime, longToZonedFormattedDateString}
+import org.etl.sparkscala.common.DateTimeUdfs.{longToZonedDateTime, longToZonedFormattedDateString}
 
 import java.time.{ZoneId, ZonedDateTime}
 import org.scalatest.flatspec.AnyFlatSpec

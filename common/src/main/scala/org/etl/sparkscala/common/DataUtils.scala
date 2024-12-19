@@ -1,4 +1,4 @@
-package org.etl.sparkscala
+package org.etl.sparkscala.common
 
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
 

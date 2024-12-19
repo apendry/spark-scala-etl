@@ -1,15 +1,8 @@
 lazy val sparkVersion = "3.2.0"
-lazy val scalaMinorVersion = "2.12.18"
 lazy val sparkTestVersion = "3.2.19"
 
 ThisBuild / organization := "org.etl.sparkscala"
-ThisBuild / scalaVersion := scalaMinorVersion
-ThisBuild / version      := "0.1.0-SNAPSHOT"
-ThisBuild / assembly / assemblyJarName := s"spark-scala-etl-uber-${(ThisBuild / version).value}.jar"
-ThisBuild / assembly / assemblyMergeStrategy := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case x => MergeStrategy.first
-}
+ThisBuild / scalaVersion := "2.12.18"
 
 lazy val commonDependencies = Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
@@ -21,17 +14,30 @@ lazy val commonDependencies = Seq(
   "org.scalatest" %% "scalatest" % sparkTestVersion % "test"
 )
 
+lazy val global = project
+  .in(file("."))
+  .disablePlugins(AssemblyPlugin)
+  .aggregate(
+    common,
+    batch
+  )
+
 lazy val common = (project in file("common"))
   .settings(
-    name := "common",
-    version := "1.0.0",
+    version := "0.0.1-SNAPSHOT",
     libraryDependencies ++= commonDependencies ++ Seq()
   )
+  .disablePlugins(AssemblyPlugin)
 
 lazy val batch = (project in file("batch"))
   .dependsOn(common)
   .settings(
-    name := "batch",
-    version := "1.0.0",
+    assemblySettings,
+    version := "0.0.1-SNAPSHOT",
     libraryDependencies ++= commonDependencies ++ Seq()
   )
+
+lazy val assemblySettings = Seq(
+  assembly / test := (Test / test).value,
+  assembly / assemblyJarName := s"spark-scala-etl-${name.value}-${version.value}.jar"
+)

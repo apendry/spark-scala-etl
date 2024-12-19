@@ -1,4 +1,4 @@
-package org.etl.sparkscala.schemas.example
+package org.etl.sparkscala.common.example
 
 case class ExamplePersonMeta(id: Int, firstName: String, lastName: String)
 

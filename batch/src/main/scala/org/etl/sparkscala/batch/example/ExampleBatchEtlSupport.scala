@@ -1,8 +1,8 @@
-package org.etl.sparkscala.example
+package org.etl.sparkscala.batch.example
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.etl.sparkscala.schemas.example.{ExampleActivity, ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
+import org.etl.sparkscala.common.example.{ExampleActivity, ExampleActivityMeta, ExampleCaloriesData, ExamplePersonMeta}
 
 object ExampleBatchEtlSupport {
 

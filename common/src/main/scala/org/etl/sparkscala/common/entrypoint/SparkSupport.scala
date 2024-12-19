@@ -1,4 +1,4 @@
-package org.etl.sparkscala.entrypoint
+package org.etl.sparkscala.common.entrypoint
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
